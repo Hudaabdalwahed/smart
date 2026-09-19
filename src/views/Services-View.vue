@@ -60,83 +60,99 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+/* =========================================
+   صفحة الخدمات (الأب الرئيسي)
+========================================= */
 .services-page {
   padding: 60px 20px;
   text-align: center;
   direction: rtl;
   min-height: 80vh;
-}
 
-.section-header .sub-title {
-  color: #25722c;
-  font-size: 14px;
-  margin-bottom: 5px;
-}
+  /* =========================================
+     رأس القسم (Header)
+  ========================================= */
+  .section-header {
+    .sub-title {
+      color: #25722c;
+      font-size: 14px;
+      margin-bottom: 5px;
+    }
 
-.section-header .main-title {
-  font-size: 32px;
-  color: #1b5e20;
-  margin-bottom: 10px;
-  font-weight: bold;
-}
+    .main-title {
+      font-size: 32px;
+      color: #1b5e20;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
 
-.section-header .description {
-  color: #666;
-  font-size: 15px;
-  margin-bottom: 40px;
-}
+    .description {
+      color: #666;
+      font-size: 15px;
+      margin-bottom: 40px;
+    }
+  }
 
-.services-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 25px;
-  max-width: 1000px;
-  margin: 0 auto;
-}
+  /* =========================================
+     شبكة الخدمات (Grid)
+  ========================================= */
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    max-width: 1000px;
+    margin: 0 auto;
 
-.service-card {
-  background: #fff;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-  text-align: right;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
+    /* بطاقة الخدمة */
+    .service-card {
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      text-align: right;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
 
-.service-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-}
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+      }
 
-.card-image img {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-}
+      /* صورة البطاقة */
+      .card-image {
+        img {
+          width: 100%;
+          height: 180px;
+          object-fit: cover;
+        }
+      }
 
-.card-content {
-  padding: 20px;
-}
+      /* محتوى البطاقة */
+      .card-content {
+        padding: 20px;
 
-.card-content h3 {
-  font-size: 18px;
-  color: #1b5e20;
-  margin-bottom: 10px;
-}
+        h3 {
+          font-size: 18px;
+          color: #1b5e20;
+          margin-bottom: 10px;
+        }
 
-.card-content p {
-  font-size: 13.5px;
-  color: #555;
-  line-height: 1.6;
-  margin-bottom: 15px;
-}
+        p {
+          font-size: 13.5px;
+          color: #555;
+          line-height: 1.6;
+          margin-bottom: 15px;
+        }
 
-.more-link {
-  color: #2e7d32;
-  text-decoration: none;
-  font-weight: bold;
-  font-size: 13px;
-  display: inline-block;
+        .more-link {
+          color: #2e7d32;
+          text-decoration: none;
+          font-weight: bold;
+          font-size: 13px;
+          display: inline-block;
+        }
+      }
+    }
+  }
 }
 </style>
