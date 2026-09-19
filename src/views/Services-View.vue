@@ -1,5 +1,6 @@
 <template>
   <div class="services-page">
+    <!-- رأس الصفحة -->
     <div class="section-header">
       <p class="sub-title">كل ما تحتاجه في مكان واحد</p>
       <h2 class="main-title">خدماتنا الإلكترونية</h2>
@@ -8,34 +9,34 @@
       </p>
     </div>
 
+    <!-- شبكة البطاقات -->
     <div class="services-grid">
-      <div
+      <!-- تمرير البيانات إلى مكون البطاقة عبر الـ Props -->
+      <ServiceCard
         v-for="(service, index) in services"
         :key="index"
-        class="service-card"
-      >
-        <div class="card-image">
-          <img :src="service.image" :alt="service.title" />
-        </div>
-        <div class="card-content">
-          <h3>{{ service.title }}</h3>
-          <p>{{ service.description }}</p>
-          <a href="#" class="more-link">المزيد &larr;</a>
-        </div>
-      </div>
+        :title="service.title"
+        :description="service.description"
+        :image="service.image"
+      />
     </div>
   </div>
 </template>
 
 <script>
+import ServiceCard from "@/components/ServiceCard.vue";
+
 export default {
   name: "ServicesView",
+  components: {
+    ServiceCard,
+  },
   data() {
     return {
       services: [
         {
-          title: "العقارت",
-          description: "إصدارالتراخيص",
+          title: "العقارات",
+          description: "إصدار التراخيص ونقل الملكيات",
           image: require("@/assets/images/house.png"),
         },
         {
@@ -68,11 +69,15 @@ export default {
   padding: 60px 20px;
   text-align: center;
   direction: rtl;
-  min-height: 80vh;
+  min-height: calc(100vh - 80px);
 
-  /* =========================================
-     رأس القسم (Header)
-  ========================================= */
+  /* خلفية الصفحة مع طبقة شفافة */
+  background: linear-gradient(
+      rgba(248, 250, 248, 0.88),
+      rgba(248, 250, 248, 0.88)
+    ),
+    url("@/assets/images/backg.jpg") center/cover no-repeat fixed;
+
   .section-header {
     .sub-title {
       color: #25722c;
@@ -94,65 +99,12 @@ export default {
     }
   }
 
-  /* =========================================
-     شبكة الخدمات (Grid)
-  ========================================= */
   .services-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 25px;
     max-width: 1000px;
     margin: 0 auto;
-
-    /* بطاقة الخدمة */
-    .service-card {
-      background: #fff;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-      text-align: right;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-
-      &:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-      }
-
-      /* صورة البطاقة */
-      .card-image {
-        img {
-          width: 100%;
-          height: 180px;
-          object-fit: cover;
-        }
-      }
-
-      /* محتوى البطاقة */
-      .card-content {
-        padding: 20px;
-
-        h3 {
-          font-size: 18px;
-          color: #1b5e20;
-          margin-bottom: 10px;
-        }
-
-        p {
-          font-size: 13.5px;
-          color: #555;
-          line-height: 1.6;
-          margin-bottom: 15px;
-        }
-
-        .more-link {
-          color: #2e7d32;
-          text-decoration: none;
-          font-weight: bold;
-          font-size: 13px;
-          display: inline-block;
-        }
-      }
-    }
   }
 }
 </style>
