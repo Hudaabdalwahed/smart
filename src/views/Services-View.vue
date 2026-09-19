@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import ServiceCard from "@/components/ServiceCard.vue";
+import ServiceCard from "@/components/Service-Card.vue";
 
 export default {
   name: "ServicesView",
