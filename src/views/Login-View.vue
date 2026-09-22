@@ -207,7 +207,16 @@ export default {
     login() {
       console.log("بيانات تسجيل الدخول:", this.loginForm);
 
-      alert("تم إرسال بيانات تسجيل الدخول");
+      // نعتبر المستخدم مسجل دخول
+      localStorage.setItem("isLoggedIn", "true");
+
+      // نخبر الـ Navbar أن المستخدم سجل دخول
+      window.dispatchEvent(new Event("login"));
+
+      alert("تم تسجيل الدخول بنجاح");
+
+      // الانتقال إلى الرئيسية
+      this.$router.push("/");
     },
 
     register() {

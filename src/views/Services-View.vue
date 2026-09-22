@@ -364,7 +364,8 @@ export default {
 
     display: grid;
 
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(3, 280px);
+    justify-content: center;
 
     gap: 28px;
 

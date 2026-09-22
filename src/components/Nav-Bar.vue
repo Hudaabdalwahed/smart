@@ -21,17 +21,66 @@
       <router-link to="/my-requests" exact-active-class="active">
         طلباتي
       </router-link>
+      <!-- مواعيدي -->
+      <router-link to="/appointments" exact-active-class="active">
+        مواعيدي
+      </router-link>
 
-      <!-- روابط سنعمل صفحاتها لاحقاً -->
+      <!-- عن البوابة -->
       <router-link to="/about" exact-active-class="active">
         عن البوابة
       </router-link>
 
       <!-- تسجيل الدخول -->
-      <router-link to="/login" class="login-btn"> تسجيل الدخول </router-link>
+      <router-link v-if="!isLoggedIn" to="/login" class="login-btn">
+        تسجيل الدخول
+      </router-link>
+
+      <!-- تسجيل الخروج -->
+      <button v-else class="login-btn logout-btn" @click="logout">
+        تسجيل الخروج
+      </button>
     </div>
   </nav>
 </template>
+
+<script>
+export default {
+  name: "NavBar",
+
+  data() {
+    return {
+      isLoggedIn: localStorage.getItem("isLoggedIn") === "true",
+    };
+  },
+
+  mounted() {
+    window.addEventListener("login", this.checkLogin);
+    window.addEventListener("logout", this.checkLogin);
+  },
+
+  beforeUnmount() {
+    window.removeEventListener("login", this.checkLogin);
+    window.removeEventListener("logout", this.checkLogin);
+  },
+
+  methods: {
+    checkLogin() {
+      this.isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+    },
+
+    logout() {
+      localStorage.removeItem("isLoggedIn");
+
+      this.isLoggedIn = false;
+
+      window.dispatchEvent(new Event("logout"));
+
+      this.$router.push("/");
+    },
+  },
+};
+</script>
 
 <style lang="scss" scoped>
 .navbar {
@@ -101,38 +150,46 @@
 
       transition: all 0.3s ease;
 
-      /* عند تمرير الماوس */
-
       &:hover {
         color: #c9a227;
       }
 
-      /* الصفحة الحالية */
-
       &.active {
         color: #c9a227;
       }
+    }
 
-      /* =====================================
-         زر تسجيل الدخول
-      ===================================== */
+    /* =====================================
+       زر تسجيل الدخول والخروج
+    ===================================== */
 
-      &.login-btn {
-        background-color: #c9a227;
+    .login-btn {
+      background-color: #c9a227;
 
-        color: white;
+      color: white;
 
-        padding: 10px 22px;
+      padding: 10px 22px;
 
-        border-radius: 25px;
+      border-radius: 25px;
 
-        border: 2px solid #c9a227;
+      border: 2px solid #c9a227;
 
-        &:hover {
-          background-color: white;
+      font-family: "Cairo", sans-serif;
 
-          color: #1b5e45;
-        }
+      font-size: 14px;
+
+      font-weight: 600;
+
+      cursor: pointer;
+
+      text-decoration: none;
+
+      transition: all 0.3s ease;
+
+      &:hover {
+        background-color: white;
+
+        color: #1b5e45;
       }
     }
   }
@@ -150,6 +207,12 @@
       a {
         font-size: 13px;
       }
+
+      .login-btn {
+        font-size: 13px;
+
+        padding: 9px 18px;
+      }
     }
 
     .logo {
@@ -157,7 +220,6 @@
 
       img {
         width: 48px;
-
         height: 48px;
       }
     }
