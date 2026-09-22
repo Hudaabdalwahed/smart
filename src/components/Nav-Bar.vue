@@ -25,7 +25,10 @@
       <router-link to="/appointments" exact-active-class="active">
         مواعيدي
       </router-link>
-
+      <!--مسلعد الخدمة-->
+      <router-link to="/smart-assistant" exact-active-class="active">
+        مساعد الخدمة
+      </router-link>
       <!-- عن البوابة -->
       <router-link to="/about" exact-active-class="active">
         عن البوابة

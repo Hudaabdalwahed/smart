@@ -10,6 +10,7 @@ import AboutView from "@/views/About-View.vue";
 import NotFoundView from "@/views/NotFound-View.vue";
 import AppointmentsView from "@/views/Appointments-View.vue";
 import AppointmentDetailsView from "@/views/Appointment-Details-View.vue";
+import SmartAssistentView from "@/views/Smart-Assistent-View.vue";
 const routes = [
   {
     path: "/",
@@ -22,7 +23,11 @@ const routes = [
     path: "/services",
     component: ServicesView,
   },
-
+  {
+    name: "smart-assistant",
+    path: "/smart-assistant",
+    component: SmartAssistentView,
+  },
   {
     name: "service-details",
     path: "/service/:id",
