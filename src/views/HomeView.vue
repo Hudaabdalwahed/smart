@@ -22,10 +22,10 @@
           أي وقت، بكل سهولة وأمان.
         </p>
 
-        <button class="services-btn">
+        <router-link to="/services" class="services-btn">
           استعراض الخدمات
           <span>←</span>
-        </button>
+        </router-link>
 
         <!-- ================= الإحصائيات ================= -->
         <div class="stats">
@@ -156,6 +156,8 @@
         font-weight: 600;
         cursor: pointer;
         transition: 0.3s;
+        text-decoration: none;
+        display: inline-flex;
 
         &:hover {
           background-color: #1b5e45;

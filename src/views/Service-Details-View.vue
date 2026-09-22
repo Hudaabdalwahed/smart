@@ -8,11 +8,15 @@
     <!-- العنوان -->
     <section class="details-header">
       <div class="header-content">
-        <span class="service-badge">خدمة إلكترونية</span>
+        <span class="service-badge"> خدمة إلكترونية </span>
 
-        <h1>خدمات العقارات</h1>
+        <h1>
+          {{ service.title }}
+        </h1>
 
-        <p>أنجز معاملاتك العقارية إلكترونياً بسهولة وأمان</p>
+        <p>
+          {{ service.subtitle }}
+        </p>
       </div>
     </section>
 
@@ -21,51 +25,47 @@
       <!-- الصورة -->
       <div class="image-section">
         <div class="image-card">
-          <img src="@/assets/images/house.png" alt="خدمات العقارات" />
+          <img :src="service.image" :alt="service.title" />
 
           <div class="image-overlay">
-            <span>خدمات العقارات</span>
+            <span>
+              {{ service.title }}
+            </span>
           </div>
         </div>
       </div>
 
-      <!-- تفاصيل الخدمة -->
+      <!-- معلومات الخدمة -->
       <div class="service-info">
         <span class="small-title"> معلومات الخدمة </span>
 
-        <h2>خدمات العقارات</h2>
+        <h2>
+          {{ service.title }}
+        </h2>
 
         <p class="intro">
-          يمكنك من خلال هذه الخدمة إنجاز مجموعة من المعاملات العقارية إلكترونياً
-          دون الحاجة إلى مراجعة الدوائر بشكل مباشر.
+          {{ service.description }}
         </p>
 
-        <!-- الخيارات -->
+        <!-- خيارات الخدمة -->
         <div class="service-options">
-          <div class="option">
-            <div class="option-icon">🏠</div>
-
-            <div>
-              <h3>تسجيل عقار</h3>
-              <p>تسجيل عقار جديد</p>
+          <div
+            v-for="(option, index) in service.options"
+            :key="index"
+            class="option"
+          >
+            <div class="option-icon">
+              {{ option.icon }}
             </div>
-          </div>
-
-          <div class="option">
-            <div class="option-icon">📄</div>
 
             <div>
-              <h3>نقل ملكية</h3>
-              <p>نقل ملكية العقار</p>
-            </div>
-          </div>
+              <h3>
+                {{ option.title }}
+              </h3>
 
-          <div class="option">
-            <div class="option-icon">📋</div>
-
-            <div>
-              <h3>سند ملكية</h3>
-              <p>استخراج سند ملكية</p>
+              <p>
+                {{ option.description }}
+              </p>
             </div>
           </div>
         </div>
@@ -88,7 +88,7 @@
           <div class="form-header">
             <span class="form-badge"> طلب جديد </span>
 
-            <h2>تقديم طلب عقاري</h2>
+            <h2>تقديم طلب {{ service.title }}</h2>
 
             <p>يرجى تعبئة المعلومات التالية لإرسال طلبك</p>
           </div>
@@ -119,7 +119,7 @@
                 />
               </div>
 
-              <!-- رقم الهاتف -->
+              <!-- الهاتف -->
               <div class="form-group">
                 <label> رقم الهاتف </label>
 
@@ -134,14 +134,16 @@
               <!-- نوع المعاملة -->
               <div class="form-group">
                 <label> نوع المعاملة </label>
+
                 <select v-model="form.requestType" required>
                   <option value="">اختر نوع المعاملة</option>
-
-                  <option value="تسجيل عقار">تسجيل عقار</option>
-
-                  <option value="نقل ملكية">نقل ملكية</option>
-
-                  <option value="سند ملكية">استخراج سند ملكية</option>
+                  <option
+                    v-for="(option, index) in service.options"
+                    :key="index"
+                    :value="option.title"
+                  >
+                    {{ option.title }}
+                  </option>
                 </select>
               </div>
             </div>
@@ -157,7 +159,7 @@
               ></textarea>
             </div>
 
-            <!-- رفع ملف -->
+            <!-- الملف -->
             <div class="form-group">
               <label> الوثيقة المطلوبة </label>
 
@@ -166,10 +168,11 @@
               <small> يمكنك إرفاق الوثيقة المطلوبة للمعاملة </small>
             </div>
 
-            <!-- زر الإرسال -->
+            <!-- إرسال -->
             <button type="submit" class="submit-btn">
               إرسال الطلب
-              <span>✓</span>
+
+              <span> ✓ </span>
             </button>
           </form>
 
@@ -201,6 +204,176 @@ export default {
 
       submitted: false,
 
+      /* =========================
+         الخدمات
+      ========================= */
+
+      services: {
+        "real-estate": {
+          title: "خدمات العقارات",
+
+          subtitle: "أنجز معاملاتك العقارية إلكترونياً بسهولة وأمان",
+
+          description:
+            "يمكنك من خلال هذه الخدمة إنجاز مجموعة من المعاملات العقارية إلكترونياً دون الحاجة إلى مراجعة الدوائر بشكل مباشر.",
+
+          image: require("@/assets/images/house.png"),
+
+          options: [
+            {
+              title: "تسجيل عقار",
+
+              description: "تسجيل عقار جديد",
+
+              icon: "🏠",
+            },
+
+            {
+              title: "نقل ملكية",
+
+              description: "نقل ملكية العقار",
+
+              icon: "📄",
+            },
+
+            {
+              title: "سند ملكية",
+
+              description: "استخراج سند ملكية",
+
+              icon: "📋",
+            },
+          ],
+        },
+
+        /* =========================
+           المركبات
+        ========================= */
+
+        vehicles: {
+          title: "خدمات المركبات",
+
+          subtitle: "أنجز معاملات مركبتك بسهولة دون الحاجة إلى الانتظار",
+
+          description:
+            "يمكنك من خلال هذه الخدمة تنفيذ مجموعة من معاملات المركبات والرخص إلكترونياً بطريقة سهلة وسريعة.",
+
+          image: require("@/assets/images/car.jpg"),
+
+          options: [
+            {
+              title: "تجديد رخصة",
+
+              description: "تجديد رخصة المركبة",
+
+              icon: "🚗",
+            },
+
+            {
+              title: "تسجيل مركبة",
+
+              description: "تسجيل مركبة جديدة",
+
+              icon: "📋",
+            },
+
+            {
+              title: "نقل ملكية مركبة",
+
+              description: "نقل ملكية المركبة",
+
+              icon: "🔄",
+            },
+          ],
+        },
+
+        /* =========================
+           التعليم
+        ========================= */
+
+        education: {
+          title: "خدمات التعليم",
+
+          subtitle: "الوصول إلى خدماتك التعليمية بسهولة",
+
+          description:
+            "يمكنك من خلال هذه الخدمة إنجاز مجموعة من المعاملات المتعلقة بالجامعات والمدارس والشهادات إلكترونياً.",
+
+          image: require("@/assets/images/edu.jpg"),
+
+          options: [
+            {
+              title: "طلب شهادة",
+
+              description: "تقديم طلب للحصول على شهادة",
+
+              icon: "🎓",
+            },
+
+            {
+              title: "تصديق شهادة",
+
+              description: "تصديق الوثائق والشهادات",
+
+              icon: "📄",
+            },
+
+            {
+              title: "كشف علامات",
+
+              description: "طلب كشف العلامات",
+
+              icon: "📋",
+            },
+          ],
+        },
+
+        /* =========================
+           الوثائق
+        ========================= */
+
+        documents: {
+          title: "الوثائق الرسمية",
+
+          subtitle: "أنجز معاملاتك المتعلقة بالوثائق الرسمية إلكترونياً",
+
+          description:
+            "يمكنك من خلال هذه الخدمة تقديم طلبات إصدار وتجديد الوثائق الرسمية بسهولة وأمان.",
+
+          image: require("@/assets/images/pass.jpg"),
+
+          options: [
+            {
+              title: "تجديد وثيقة",
+
+              description: "تجديد الوثائق الرسمية",
+
+              icon: "📄",
+            },
+
+            {
+              title: "إصدار وثيقة",
+
+              description: "إصدار وثيقة رسمية جديدة",
+
+              icon: "🪪",
+            },
+
+            {
+              title: "بيان شخصي",
+
+              description: "استخراج بيان شخصي",
+
+              icon: "📋",
+            },
+          ],
+        },
+      },
+
+      /* =========================
+         بيانات النموذج
+      ========================= */
+
       form: {
         fullName: "",
 
@@ -217,15 +390,87 @@ export default {
     };
   },
 
+  /* =========================
+     الخدمة الحالية
+  ========================= */
+
+  computed: {
+    service() {
+      const id = this.$route.params.id;
+
+      return this.services[id] || this.services["real-estate"];
+    },
+  },
+
+  /* =========================
+     العمليات
+  ========================= */
+
   methods: {
     handleFile(event) {
       this.form.file = event.target.files[0];
     },
 
     submitRequest() {
+      /*
+       * نجيب الطلبات القديمة
+       */
+
+      const oldRequests = JSON.parse(localStorage.getItem("requests")) || [];
+
+      /*
+       * إنشاء طلب جديد
+       */
+
+      const newRequest = {
+        id: "REQ-" + Date.now(),
+
+        service: this.service.title,
+
+        serviceId: this.$route.params.id,
+
+        requestType: this.form.requestType,
+
+        fullName: this.form.fullName,
+
+        nationalId: this.form.nationalId,
+
+        phone: this.form.phone,
+
+        notes: this.form.notes,
+
+        status: "قيد المراجعة",
+
+        statusClass: "pending",
+
+        progress: 10,
+
+        date: new Date().toLocaleDateString("ar-SY"),
+      };
+
+      /*
+       * إضافة الطلب الجديد
+       */
+
+      oldRequests.push(newRequest);
+
+      /*
+       * حفظ الطلبات
+       */
+
+      localStorage.setItem(
+        "requests",
+
+        JSON.stringify(oldRequests)
+      );
+
+      /*
+       * إظهار رسالة النجاح
+       */
+
       this.submitted = true;
 
-      console.log("بيانات الطلب:", this.form);
+      console.log("تم إرسال الطلب:", newRequest);
     },
   },
 };
@@ -242,7 +487,6 @@ export default {
   direction: rtl;
 
   padding-bottom: 80px;
-
   background: linear-gradient(135deg, #edf8f1 0%, #ffffff 48%, #f8f2df 100%);
 }
 
@@ -337,6 +581,7 @@ export default {
   border-radius: 30px;
 
   background: rgba(201, 162, 39, 0.15);
+
   color: #9b7912;
 
   font-size: 14px;
@@ -536,7 +781,6 @@ export default {
   justify-content: center;
 
   border-radius: 15px;
-
   background: #edf8f1;
 
   font-size: 22px;
@@ -662,6 +906,7 @@ export default {
   display: flex;
 
   flex-direction: column;
+
   gap: 8px;
 
   margin-bottom: 20px;
@@ -818,7 +1063,6 @@ export default {
 /* =========================
    Animations
 ========================= */
-
 .slide-enter-active,
 .slide-leave-active {
   transition: opacity 0.4s ease, transform 0.4s ease;

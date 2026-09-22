@@ -1,3 +1,4 @@
+[9/22/2026 4:43 PM] Huda Abdalwahed:
 <template>
   <div class="requests-page">
     <!-- خلفيات زخرفية -->
@@ -23,7 +24,7 @@
 
         <div>
           <strong>
-            {{ requests.length }}
+            {{ totalCount }}
           </strong>
 
           <span> إجمالي الطلبات </span>
@@ -72,7 +73,6 @@
 
         <button class="filter-btn">
           جميع الطلبات
-
           <span> ⌄ </span>
         </button>
       </div>
@@ -109,7 +109,7 @@
               <span class="label"> نوع المعاملة </span>
 
               <strong>
-                {{ request.type }}
+                {{ request.type || request.requestType }}
               </strong>
             </div>
 
@@ -134,16 +134,25 @@
               <div class="progress-bar">
                 <div
                   class="progress"
-                  :style="{ width: request.progress + '%' }"
+                  :style="{
+                    width: request.progress + '%',
+                  }"
                 ></div>
               </div>
             </div>
-            <button class="details-btn">
-              عرض التفاصيل
 
+            <button class="details-btn" @click="showDetials(request)">
+              عرض التفاصيل
               <span> ← </span>
             </button>
           </div>
+        </div>
+
+        <!-- في حال ما في طلبات -->
+        <div v-if="requests.length === 0" class="empty-state">
+          <h3>لا يوجد لديك طلبات حالياً</h3>
+
+          <p>عند إرسال طلب جديد سيظهر هنا.</p>
         </div>
       </div>
     </section>
@@ -156,51 +165,19 @@ export default {
 
   data() {
     return {
-      requests: [
-        {
-          id: "#REQ-1024",
-          service: "خدمات العقارات",
-          type: "نقل ملكية",
-          date: "19 / 09 / 2026",
-          status: "قيد المراجعة",
-          statusClass: "pending",
-          progress: 55,
-        },
-
-        {
-          id: "#REQ-1023",
-          service: "الوثائق الرسمية",
-          type: "تجديد وثيقة",
-          date: "18 / 09 / 2026",
-          status: "مكتمل",
-          statusClass: "completed",
-          progress: 100,
-        },
-
-        {
-          id: "#REQ-1022",
-          service: "خدمات التعليم",
-          type: "طلب شهادة",
-          date: "17 / 09 / 2026",
-          status: "بحاجة لتعديل",
-          statusClass: "needs-edit",
-          progress: 35,
-        },
-
-        {
-          id: "#REQ-1021",
-          service: "خدمات المركبات",
-          type: "تجديد رخصة",
-          date: "15 / 09 / 2026",
-          status: "قيد المراجعة",
-          statusClass: "pending",
-          progress: 70,
-        },
-      ],
+      requests: [],
     };
   },
 
+  created() {
+    this.loadRequests();
+  },
+
   computed: {
+    totalCount() {
+      return this.requests.length;
+    },
+
     pendingCount() {
       return this.requests.filter(
         (request) => request.statusClass === "pending"
@@ -211,6 +188,22 @@ export default {
       return this.requests.filter(
         (request) => request.statusClass === "completed"
       ).length;
+    },
+  },
+
+  methods: {
+    loadRequests() {
+      const savedRequests = JSON.parse(localStorage.getItem("requests")) || [];
+
+      this.requests = savedRequests;
+    },
+    showDetials(request) {
+      this.$router.push({
+        name: "request-details",
+        params: {
+          id: request.id,
+        },
+      });
     },
   },
 };
@@ -231,8 +224,6 @@ export default {
   direction: rtl;
 
   padding-bottom: 100px;
-
-  /* تدرج أخضر + ذهبي */
 
   background: radial-gradient(
       circle at 90% 10%,
@@ -381,6 +372,7 @@ export default {
     rgba(255, 255, 255, 0.72),
     rgba(232, 245, 237, 0.68)
   );
+
   backdrop-filter: blur(18px);
 
   -webkit-backdrop-filter: blur(18px);
@@ -423,7 +415,6 @@ export default {
 .stat-icon.pending {
   background: linear-gradient(135deg, #f8efd0, #ead99b);
 }
-
 .stat-icon.completed {
   background: linear-gradient(135deg, #d9f0e2, #b8dfca);
 }
@@ -659,6 +650,7 @@ export default {
 
   font-size: 12px;
 }
+
 .info-item strong {
   color: #334a40;
 
@@ -724,7 +716,6 @@ export default {
 
   transition: width 0.5s ease;
 }
-
 /* ===================================
    زر التفاصيل
 =================================== */
@@ -757,6 +748,36 @@ export default {
 
 .details-btn span {
   margin-right: 7px;
+}
+
+/* ===================================
+   لا يوجد طلبات
+=================================== */
+
+.empty-state {
+  text-align: center;
+
+  padding: 60px 20px;
+
+  border-radius: 24px;
+
+  background: rgba(255, 255, 255, 0.65);
+
+  backdrop-filter: blur(15px);
+
+  box-shadow: 0 15px 40px rgba(27, 94, 69, 0.08);
+}
+
+.empty-state h3 {
+  color: #1b5e45;
+
+  margin-bottom: 10px;
+}
+
+.empty-state p {
+  color: #62776b;
+
+  margin: 0;
 }
 
 /* ===================================
