@@ -47,42 +47,37 @@
   </nav>
 </template>
 
-<script>
-export default {
-  name: "NavBar",
+<script setup lang="ts">
+import { onMounted, onBeforeUnmount, ref } from "vue";
+import { useRouter } from "vue-router";
 
-  data() {
-    return {
-      isLoggedIn: localStorage.getItem("isLoggedIn") === "true",
-    };
-  },
+const router = useRouter();
 
-  mounted() {
-    window.addEventListener("login", this.checkLogin);
-    window.addEventListener("logout", this.checkLogin);
-  },
+const isLoggedIn = ref(localStorage.getItem("isLoggedIn") === "true");
 
-  beforeUnmount() {
-    window.removeEventListener("login", this.checkLogin);
-    window.removeEventListener("logout", this.checkLogin);
-  },
+function checkLogin() {
+  isLoggedIn.value = localStorage.getItem("isLoggedIn") === "true";
+}
 
-  methods: {
-    checkLogin() {
-      this.isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
-    },
+function logout() {
+  localStorage.removeItem("isLoggedIn");
 
-    logout() {
-      localStorage.removeItem("isLoggedIn");
+  isLoggedIn.value = false;
 
-      this.isLoggedIn = false;
+  window.dispatchEvent(new Event("logout"));
 
-      window.dispatchEvent(new Event("logout"));
+  router.push("/");
+}
 
-      this.$router.push("/");
-    },
-  },
-};
+onMounted(() => {
+  window.addEventListener("login", checkLogin);
+  window.addEventListener("logout", checkLogin);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("login", checkLogin);
+  window.removeEventListener("logout", checkLogin);
+});
 </script>
 
 <style lang="scss" scoped>

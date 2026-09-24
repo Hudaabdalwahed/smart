@@ -212,173 +212,185 @@
     </section>
   </main>
 </template>
+<script setup lang="ts">
+import { ref } from "vue";
+import { useRouter } from "vue-router";
 
-<script>
-export default {
-  name: "AppointmentsView",
+import { useAppointmentStore } from "../stores/appointmentStore";
+import type { Appointment } from "../stores/appointmentStore";
 
-  data() {
-    return {
-      /* =====================================
-         بيانات نموذج الحجز
-      ====================================== */
+/* =====================================
+   Router
+===================================== */
 
-      form: {
-        service: "",
-        department: "",
-        date: "",
-        time: "",
-        notes: "",
-      },
+const router = useRouter();
 
-      /* =====================================
-         قائمة المواعيد
-      ====================================== */
+/* =====================================
+   Pinia Store
+===================================== */
 
-      appointments: [],
+const appointmentStore = useAppointmentStore();
 
-      /* =====================================
-         رسالة النجاح
-      ====================================== */
+/* =====================================
+   نموذج الموعد
+===================================== */
 
-      successMessage: "",
-    };
-  },
+interface AppointmentForm {
+  service: string;
+  department: string;
+  date: string;
+  time: string;
+  notes: string;
+}
+
+const form = ref<AppointmentForm>({
+  service: "",
+  department: "",
+  date: "",
+  time: "",
+  notes: "",
+});
+
+/* =====================================
+   قائمة المواعيد
+===================================== */
+
+const appointments = ref<Appointment[]>([]);
+
+/* =====================================
+   رسالة النجاح
+===================================== */
+
+const successMessage = ref<string>("");
+
+/* =====================================
+   تحميل المواعيد
+===================================== */
+
+appointmentStore.loadAppointments();
+
+appointments.value = appointmentStore.appointments;
+
+/* =====================================
+   فتح تفاصيل الموعد
+===================================== */
+
+function viewAppointment(id: string): void {
+  router.push({
+    name: "appointment-details",
+    params: {
+      id: id,
+    },
+  });
+}
+
+/* =====================================
+   حجز موعد
+===================================== */
+
+function bookAppointment(): void {
+  const newAppointment: Appointment = {
+    id: "APP-" + Date.now(),
+
+    service: getServiceName(form.value.service),
+
+    department: getDepartmentName(form.value.department),
+
+    date: form.value.date,
+
+    time: form.value.time,
+
+    notes: form.value.notes,
+
+    status: "موعد مؤكد",
+  };
 
   /* =====================================
-     عند فتح الصفحة
-  ====================================== */
+     إضافة الموعد إلى Pinia
+  ===================================== */
 
-  created() {
-    this.loadAppointments();
-  },
+  appointmentStore.addAppointment(newAppointment);
 
-  methods: {
-    viewAppointment(id) {
-      this.$router.push({
-        name: "appointment-details",
-        params: {
-          id: id,
-        },
-      });
-    },
-    /* =====================================
-       تحميل المواعيد من LocalStorage
-    ====================================== */
+  /* =====================================
+     رسالة النجاح
+  ===================================== */
 
-    loadAppointments() {
-      this.appointments =
-        JSON.parse(localStorage.getItem("appointments")) || [];
-    },
+  successMessage.value = "تم حجز موعدك بنجاح 🎉";
 
-    /* =====================================
-       حجز موعد جديد
-    ====================================== */
+  /* =====================================
+     تفريغ النموذج
+  ===================================== */
 
-    bookAppointment() {
-      const newAppointment = {
-        id: "APP-" + Date.now(),
-        service: this.getServiceName(this.form.service),
+  form.value = {
+    service: "",
+    department: "",
+    date: "",
+    time: "",
+    notes: "",
+  };
 
-        department: this.getDepartmentName(this.form.department),
+  /* =====================================
+     إخفاء الرسالة
+  ===================================== */
 
-        date: this.form.date,
+  setTimeout(() => {
+    successMessage.value = "";
+  }, 4000);
+}
 
-        time: this.form.time,
+/* =====================================
+   إلغاء موعد
+===================================== */
 
-        notes: this.form.notes,
+function cancelAppointment(id: string): void {
+  const confirmed = confirm("هل أنت متأكد من إلغاء الموعد؟");
 
-        status: "موعد مؤكد",
-      };
+  if (!confirmed) {
+    return;
+  }
 
-      /* إضافة الموعد للقائمة */
+  /* =====================================
+     حذف الموعد من Pinia
+  ===================================== */
 
-      this.appointments.push(newAppointment);
+  appointmentStore.deleteAppointment(id);
+}
 
-      /* حفظ المواعيد */
+/* =====================================
+   اسم الخدمة
+===================================== */
 
-      localStorage.setItem("appointments", JSON.stringify(this.appointments));
+function getServiceName(service: string): string {
+  const services: Record<string, string> = {
+    "real-estate": "الخدمات العقارية",
 
-      /* رسالة النجاح */
+    vehicles: "خدمات المركبات",
 
-      this.successMessage = "تم حجز موعدك بنجاح 🎉";
+    documents: "الوثائق الرسمية",
 
-      /* تفريغ النموذج */
+    education: "الخدمات التعليمية",
+  };
 
-      this.form = {
-        service: "",
+  return services[service] || "";
+}
 
-        department: "",
+/* =====================================
+   اسم الجهة
+===================================== */
 
-        date: "",
+function getDepartmentName(department: string): string {
+  const departments: Record<string, string> = {
+    "real-estate-office": "المديرية العقارية",
 
-        time: "",
+    traffic: "مديرية النقل",
 
-        notes: "",
-      };
+    "civil-registry": "الأحوال المدنية",
 
-      /* إخفاء الرسالة بعد 4 ثواني */
+    "education-office": "مديرية التربية",
+  };
 
-      setTimeout(() => {
-        this.successMessage = "";
-      }, 4000);
-    },
-
-    /* =====================================
-       إلغاء الموعد
-    ====================================== */
-
-    cancelAppointment(id) {
-      const confirmed = confirm("هل أنت متأكد من إلغاء الموعد؟");
-
-      if (!confirmed) {
-        return;
-      }
-
-      this.appointments = this.appointments.filter(
-        (appointment) => appointment.id !== id
-      );
-
-      localStorage.setItem("appointments", JSON.stringify(this.appointments));
-    },
-
-    /* =====================================
-       تحويل ID الخدمة إلى اسم
-    ====================================== */
-
-    getServiceName(service) {
-      const services = {
-        "real-estate": "الخدمات العقارية",
-
-        vehicles: "خدمات المركبات",
-
-        documents: "الوثائق الرسمية",
-
-        education: "الخدمات التعليمية",
-      };
-
-      return services[service];
-    },
-
-    /* =====================================
-       تحويل ID الجهة إلى اسم
-    ====================================== */
-
-    getDepartmentName(department) {
-      const departments = {
-        "real-estate-office": "المديرية العقارية",
-
-        traffic: "مديرية النقل",
-
-        "civil-registry": "الأحوال المدنية",
-
-        "education-office": "مديرية التربية",
-      };
-
-      return departments[department];
-    },
-  },
-};
+  return departments[department] || "";
+}
 </script>
 
 <style lang="scss" scoped>

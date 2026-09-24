@@ -1,4 +1,3 @@
-[9/22/2026 5:59 PM] Huda Abdalwahed:
 <template>
   <div class="about-page">
     <!-- ================= HERO ================= -->
@@ -166,11 +165,7 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "AboutView",
-};
-</script>
+<script setup lang="ts"></script>
 
 <style lang="scss" scoped>
 .about-page {

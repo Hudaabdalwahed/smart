@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
+import type { RouteRecordRaw } from "vue-router";
 
 import HomeView from "@/views/HomeView.vue";
 import ServicesView from "@/views/Services-View.vue";
@@ -11,7 +12,12 @@ import NotFoundView from "@/views/NotFound-View.vue";
 import AppointmentsView from "@/views/Appointments-View.vue";
 import AppointmentDetailsView from "@/views/Appointment-Details-View.vue";
 import SmartAssistentView from "@/views/Smart-Assistent-View.vue";
-const routes = [
+
+/* =========================================
+   Routes
+========================================= */
+
+const routes: RouteRecordRaw[] = [
   {
     path: "/",
     name: "home",
@@ -23,11 +29,13 @@ const routes = [
     path: "/services",
     component: ServicesView,
   },
+
   {
     name: "smart-assistant",
     path: "/smart-assistant",
     component: SmartAssistentView,
   },
+
   {
     name: "service-details",
     path: "/service/:id",
@@ -67,27 +75,35 @@ const routes = [
   },
 
   {
-    path: "/:pathMatch(.*)*",
-    name: "not-found",
-    component: NotFoundView,
-  },
-  {
     name: "appointments",
     path: "/appointments",
     component: AppointmentsView,
+
     meta: {
       requiresAuth: true,
     },
   },
+
   {
     name: "appointment-details",
     path: "/appointment/:id",
     component: AppointmentDetailsView,
+
     meta: {
       requiresAuth: true,
     },
   },
+
+  {
+    path: "/:pathMatch(.*)*",
+    name: "not-found",
+    component: NotFoundView,
+  },
 ];
+
+/* =========================================
+   Router
+========================================= */
 
 const router = createRouter({
   history: createWebHistory(),
@@ -98,14 +114,16 @@ const router = createRouter({
    Login Guard
 ========================================= */
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to) => {
   const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
 
   if (to.meta.requiresAuth && !isLoggedIn) {
-    next("/login");
-  } else {
-    next();
+    return {
+      name: "login",
+    };
   }
+
+  return true;
 });
 
 export default router;

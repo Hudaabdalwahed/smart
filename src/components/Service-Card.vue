@@ -17,47 +17,40 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "ServiceCard",
-
-  emits: ["show-details"],
-
-  props: {
-    title: {
-      type: String,
-      required: true,
-    },
-
-    description: {
-      type: String,
-      required: true,
-    },
-
-    image: {
-      type: String,
-      required: true,
-    },
-
-    id: {
-      type: String,
-      required: true,
-    },
+<script setup lang="ts">
+const props = defineProps({
+  title: {
+    type: String,
+    required: true,
   },
 
-  methods: {
-    showDetails() {
-      this.$emit("show-details", {
-        title: this.title,
-        description: this.description,
-        image: this.image,
-        id: this.id,
-      });
-    },
+  description: {
+    type: String,
+    required: true,
   },
-};
+
+  image: {
+    type: String,
+    required: true,
+  },
+
+  id: {
+    type: String,
+    required: true,
+  },
+});
+
+const emit = defineEmits(["show-details"]);
+
+function showDetails() {
+  emit("show-details", {
+    title: props.title,
+    description: props.description,
+    image: props.image,
+    id: props.id,
+  });
+}
 </script>
-
 <style lang="scss" scoped>
 .service-card {
   background: #ffffff;

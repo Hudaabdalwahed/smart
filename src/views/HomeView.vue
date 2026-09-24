@@ -117,52 +117,48 @@
   </main>
 </template>
 
-<script>
-export default {
-  name: "HomeView",
+<script setup lang="ts">
+interface PopularService {
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+  requests: string;
+}
 
-  data() {
-    return {
-      /* =========================================
-         الخدمات الأكثر استخداماً
-      ========================================= */
-
-      popularServices: [
-        {
-          id: "real-estate",
-          title: "العقارات",
-          description: "خدمات الملكيات والتراخيص العقارية",
-          image: require("@/assets/images/house.png"),
-          requests: "1,240",
-        },
-
-        {
-          id: "vehicles",
-          title: "المركبات",
-          description: "خدمات السيارات والرخص وتجديدها",
-          image: require("@/assets/images/car.jpg"),
-          requests: "980",
-        },
-
-        {
-          id: "documents",
-          title: "الوثائق الرسمية",
-          description: "إصدار وتجديد الوثائق الرسمية",
-          image: require("@/assets/images/pass.jpg"),
-          requests: "850",
-        },
-
-        {
-          id: "education",
-          title: "التعليم",
-          description: "خدمات الجامعات والمدارس والشهادات",
-          image: require("@/assets/images/edu.jpg"),
-          requests: "620",
-        },
-      ],
-    };
+const popularServices: PopularService[] = [
+  {
+    id: "real-estate",
+    title: "العقارات",
+    description: "خدمات الملكيات والتراخيص العقارية",
+    image: require("@/assets/images/house.png"),
+    requests: "1,240",
   },
-};
+
+  {
+    id: "vehicles",
+    title: "المركبات",
+    description: "خدمات السيارات والرخص وتجديدها",
+    image: require("@/assets/images/car.jpg"),
+    requests: "980",
+  },
+
+  {
+    id: "documents",
+    title: "الوثائق الرسمية",
+    description: "إصدار وتجديد الوثائق الرسمية",
+    image: require("@/assets/images/pass.jpg"),
+    requests: "850",
+  },
+
+  {
+    id: "education",
+    title: "التعليم",
+    description: "خدمات الجامعات والمدارس والشهادات",
+    image: require("@/assets/images/edu.jpg"),
+    requests: "620",
+  },
+];
 </script>
 
 <style lang="scss" scoped>

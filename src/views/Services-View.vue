@@ -48,109 +48,76 @@
     </div>
   </div>
 </template>
-
-<script>
+<script setup lang="ts">
+import { ref, computed } from "vue";
+import { useRouter } from "vue-router";
 import ServiceCard from "@/components/Service-Card.vue";
 
-export default {
-  name: "ServicesView",
+interface Service {
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+}
 
-  components: {
-    ServiceCard,
+const router = useRouter();
+
+const searchText = ref("");
+
+const services: Service[] = [
+  {
+    id: "real-estate",
+    title: "العقارات",
+    description: "إصدار التراخيص ونقل الملكيات",
+    image: require("@/assets/images/house.png"),
   },
 
-  data() {
-    return {
-      // النص الذي يكتبه المستخدم في البحث
-      searchText: "",
-
-      // جميع الخدمات
-      services: [
-        {
-          id: "real-estate",
-
-          title: "العقارات",
-
-          description: "إصدار التراخيص ونقل الملكيات",
-
-          image: require("@/assets/images/house.png"),
-        },
-
-        {
-          id: "vehicles",
-
-          title: "المركبات",
-
-          description: "خدمات السيارات والرخص وتجديدها",
-
-          image: require("@/assets/images/car.jpg"),
-        },
-
-        {
-          id: "education",
-
-          title: "التعليم",
-
-          description: "خدمات الجامعات والمدارس والشهادات",
-
-          image: require("@/assets/images/edu.jpg"),
-        },
-
-        {
-          id: "documents",
-
-          title: "الوثائق الرسمية",
-
-          description:
-            "إصدار وتجديد الوثائق الرسمية مثل الهوية والجواز والسجل المدني",
-
-          image: require("@/assets/images/pass.jpg"),
-        },
-      ],
-    };
+  {
+    id: "vehicles",
+    title: "المركبات",
+    description: "خدمات السيارات والرخص وتجديدها",
+    image: require("@/assets/images/car.jpg"),
   },
 
-  // ================= COMPUTED =================
+  {
+    id: "education",
+    title: "التعليم",
+    description: "خدمات الجامعات والمدارس والشهادات",
+    image: require("@/assets/images/edu.jpg"),
+  },
 
-  computed: {
-    filteredServices() {
-      // إذا لم يكتب المستخدم شيئاً
-      // نعرض جميع الخدمات
+  {
+    id: "documents",
+    title: "الوثائق الرسمية",
+    description:
+      "إصدار وتجديد الوثائق الرسمية مثل الهوية والجواز والسجل المدني",
+    image: require("@/assets/images/pass.jpg"),
+  },
+];
 
-      if (!this.searchText.trim()) {
-        return this.services;
-      }
+const filteredServices = computed(() => {
+  if (!searchText.value.trim()) {
+    return services;
+  }
 
-      // تحويل البحث إلى أحرف صغيرة
-      // حتى يكون البحث أسهل
+  const search = searchText.value.trim().toLowerCase();
 
-      const search = this.searchText.trim().toLowerCase();
+  return services.filter((service) => {
+    return (
+      service.title.toLowerCase().includes(search) ||
+      service.description.toLowerCase().includes(search)
+    );
+  });
+});
 
-      // تصفية الخدمات
-
-      return this.services.filter((service) => {
-        return (
-          service.title.toLowerCase().includes(search) ||
-          service.description.toLowerCase().includes(search)
-        );
-      });
+function openDetails(service: Service) {
+  router.push({
+    name: "service-details",
+    params: {
+      id: service.id,
     },
-  },
-
-  // ================= METHODS =================
-
-  methods: {
-    openDetails(service) {
-      this.$router.push({
-        name: "service-details",
-
-        params: {
-          id: service.id,
-        },
-      });
-    },
-  },
-};
+  });
+}
 </script>
 
 <style lang="scss" scoped>

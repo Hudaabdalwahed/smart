@@ -171,69 +171,97 @@
     </div>
   </div>
 </template>
+<script setup lang="ts">
+import { ref } from "vue";
+import { useRouter } from "vue-router";
 
-<script>
-export default {
-  name: "LoginView",
+/* =====================================
+   أنواع البيانات
+===================================== */
 
-  data() {
-    return {
-      // تحديد الوضع الحالي
-      mode: "login",
+interface LoginForm {
+  email: string;
+  password: string;
+}
 
-      // إظهار / إخفاء كلمة المرور
-      showPassword: false,
+interface RegisterForm {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
 
-      // تذكرني
-      rememberMe: false,
+/* =====================================
+   Router
+===================================== */
 
-      // بيانات تسجيل الدخول
-      loginForm: {
-        email: "",
-        password: "",
-      },
+const router = useRouter();
 
-      // بيانات إنشاء الحساب
-      registerForm: {
-        name: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
-      },
-    };
-  },
+/* =====================================
+   حالة الصفحة
+===================================== */
 
-  methods: {
-    login() {
-      console.log("بيانات تسجيل الدخول:", this.loginForm);
+const mode = ref<"login" | "register">("login");
 
-      // نعتبر المستخدم مسجل دخول
-      localStorage.setItem("isLoggedIn", "true");
+const showPassword = ref<boolean>(false);
 
-      // نخبر الـ Navbar أن المستخدم سجل دخول
-      window.dispatchEvent(new Event("login"));
+const rememberMe = ref<boolean>(false);
 
-      alert("تم تسجيل الدخول بنجاح");
+/* =====================================
+   بيانات تسجيل الدخول
+===================================== */
 
-      // الانتقال إلى الرئيسية
-      this.$router.push("/");
-    },
+const loginForm = ref<LoginForm>({
+  email: "",
+  password: "",
+});
 
-    register() {
-      if (this.registerForm.password !== this.registerForm.confirmPassword) {
-        alert("كلمتا المرور غير متطابقتين");
+/* =====================================
+   بيانات إنشاء الحساب
+===================================== */
 
-        return;
-      }
+const registerForm = ref<RegisterForm>({
+  name: "",
+  email: "",
+  password: "",
+  confirmPassword: "",
+});
 
-      console.log("بيانات إنشاء الحساب:", this.registerForm);
+/* =====================================
+   تسجيل الدخول
+===================================== */
 
-      alert("تم إرسال بيانات إنشاء الحساب");
-    },
-  },
-};
+function login(): void {
+  console.log("بيانات تسجيل الدخول:", loginForm.value);
+
+  // نعتبر المستخدم مسجل دخول
+  localStorage.setItem("isLoggedIn", "true");
+
+  // نخبر الـ Navbar أن المستخدم سجل دخول
+  window.dispatchEvent(new Event("login"));
+
+  alert("تم تسجيل الدخول بنجاح");
+
+  // الانتقال إلى الرئيسية
+  router.push("/");
+}
+
+/* =====================================
+   إنشاء حساب
+===================================== */
+
+function register(): void {
+  if (registerForm.value.password !== registerForm.value.confirmPassword) {
+    alert("كلمتا المرور غير متطابقتين");
+
+    return;
+  }
+
+  console.log("بيانات إنشاء الحساب:", registerForm.value);
+
+  alert("تم إرسال بيانات إنشاء الحساب");
+}
 </script>
-
 <style lang="scss" scoped>
 .login-page {
   min-height: 100vh;

@@ -193,288 +193,252 @@
     </transition>
   </div>
 </template>
+<script setup lang="ts">
+import { ref, computed } from "vue";
+import { useRoute } from "vue-router";
 
-<script>
-export default {
-  name: "ServiceDetailsView",
+import { useRequestStore } from "../stores/requestStore";
+import type { Request } from "../stores/requestStore";
 
-  data() {
-    return {
-      showForm: false,
+interface ServiceOption {
+  title: string;
+  description: string;
+  icon: string;
+}
 
-      submitted: false,
+interface Service {
+  title: string;
+  subtitle: string;
+  description: string;
+  image: string;
+  options: ServiceOption[];
+}
 
-      /* =========================
-         الخدمات
-      ========================= */
+interface RequestForm {
+  fullName: string;
+  nationalId: string;
+  phone: string;
+  requestType: string;
+  notes: string;
+  file: File | null;
+}
 
-      services: {
-        "real-estate": {
-          title: "خدمات العقارات",
+/* =====================================
+   Router
+===================================== */
 
-          subtitle: "أنجز معاملاتك العقارية إلكترونياً بسهولة وأمان",
+const route = useRoute();
 
-          description:
-            "يمكنك من خلال هذه الخدمة إنجاز مجموعة من المعاملات العقارية إلكترونياً دون الحاجة إلى مراجعة الدوائر بشكل مباشر.",
+/* =====================================
+   Pinia Store
+===================================== */
 
-          image: require("@/assets/images/house.png"),
+const requestStore = useRequestStore();
 
-          options: [
-            {
-              title: "تسجيل عقار",
+/* =====================================
+   حالة النموذج
+===================================== */
 
-              description: "تسجيل عقار جديد",
+const showForm = ref(false);
+const submitted = ref(false);
 
-              icon: "🏠",
-            },
+/* =====================================
+   الخدمات
+===================================== */
 
-            {
-              title: "نقل ملكية",
+const services: Record<string, Service> = {
+  "real-estate": {
+    title: "خدمات العقارات",
+    subtitle: "أنجز معاملاتك العقارية إلكترونياً بسهولة وأمان",
 
-              description: "نقل ملكية العقار",
+    description:
+      "يمكنك من خلال هذه الخدمة إنجاز مجموعة من المعاملات العقارية إلكترونياً دون الحاجة إلى مراجعة الدوائر بشكل مباشر.",
 
-              icon: "📄",
-            },
+    image: require("@/assets/images/house.png"),
 
-            {
-              title: "سند ملكية",
-
-              description: "استخراج سند ملكية",
-
-              icon: "📋",
-            },
-          ],
-        },
-
-        /* =========================
-           المركبات
-        ========================= */
-
-        vehicles: {
-          title: "خدمات المركبات",
-
-          subtitle: "أنجز معاملات مركبتك بسهولة دون الحاجة إلى الانتظار",
-
-          description:
-            "يمكنك من خلال هذه الخدمة تنفيذ مجموعة من معاملات المركبات والرخص إلكترونياً بطريقة سهلة وسريعة.",
-
-          image: require("@/assets/images/car.jpg"),
-
-          options: [
-            {
-              title: "تجديد رخصة",
-
-              description: "تجديد رخصة المركبة",
-
-              icon: "🚗",
-            },
-
-            {
-              title: "تسجيل مركبة",
-
-              description: "تسجيل مركبة جديدة",
-
-              icon: "📋",
-            },
-
-            {
-              title: "نقل ملكية مركبة",
-
-              description: "نقل ملكية المركبة",
-
-              icon: "🔄",
-            },
-          ],
-        },
-
-        /* =========================
-           التعليم
-        ========================= */
-
-        education: {
-          title: "خدمات التعليم",
-
-          subtitle: "الوصول إلى خدماتك التعليمية بسهولة",
-
-          description:
-            "يمكنك من خلال هذه الخدمة إنجاز مجموعة من المعاملات المتعلقة بالجامعات والمدارس والشهادات إلكترونياً.",
-
-          image: require("@/assets/images/edu.jpg"),
-
-          options: [
-            {
-              title: "طلب شهادة",
-
-              description: "تقديم طلب للحصول على شهادة",
-
-              icon: "🎓",
-            },
-
-            {
-              title: "تصديق شهادة",
-
-              description: "تصديق الوثائق والشهادات",
-
-              icon: "📄",
-            },
-
-            {
-              title: "كشف علامات",
-
-              description: "طلب كشف العلامات",
-
-              icon: "📋",
-            },
-          ],
-        },
-
-        /* =========================
-           الوثائق
-        ========================= */
-
-        documents: {
-          title: "الوثائق الرسمية",
-
-          subtitle: "أنجز معاملاتك المتعلقة بالوثائق الرسمية إلكترونياً",
-
-          description:
-            "يمكنك من خلال هذه الخدمة تقديم طلبات إصدار وتجديد الوثائق الرسمية بسهولة وأمان.",
-
-          image: require("@/assets/images/pass.jpg"),
-
-          options: [
-            {
-              title: "تجديد وثيقة",
-
-              description: "تجديد الوثائق الرسمية",
-
-              icon: "📄",
-            },
-
-            {
-              title: "إصدار وثيقة",
-
-              description: "إصدار وثيقة رسمية جديدة",
-
-              icon: "🪪",
-            },
-
-            {
-              title: "بيان شخصي",
-
-              description: "استخراج بيان شخصي",
-
-              icon: "📋",
-            },
-          ],
-        },
+    options: [
+      {
+        title: "تسجيل عقار",
+        description: "تسجيل عقار جديد",
+        icon: "🏠",
       },
-
-      /* =========================
-         بيانات النموذج
-      ========================= */
-
-      form: {
-        fullName: "",
-
-        nationalId: "",
-
-        phone: "",
-
-        requestType: "",
-
-        notes: "",
-
-        file: null,
+      {
+        title: "نقل ملكية",
+        description: "نقل ملكية العقار",
+        icon: "📄",
       },
-    };
+      {
+        title: "سند ملكية",
+        description: "استخراج سند ملكية",
+        icon: "📋",
+      },
+    ],
   },
 
-  /* =========================
-     الخدمة الحالية
-  ========================= */
+  vehicles: {
+    title: "خدمات المركبات",
+    subtitle: "أنجز معاملات مركبتك بسهولة دون الحاجة إلى الانتظار",
 
-  computed: {
-    service() {
-      const id = this.$route.params.id;
+    description:
+      "يمكنك من خلال هذه الخدمة تنفيذ مجموعة من معاملات المركبات والرخص إلكترونياً بطريقة سهلة وسريعة.",
 
-      return this.services[id] || this.services["real-estate"];
-    },
+    image: require("@/assets/images/car.jpg"),
+
+    options: [
+      {
+        title: "تجديد رخصة",
+        description: "تجديد رخصة المركبة",
+        icon: "🚗",
+      },
+      {
+        title: "تسجيل مركبة",
+        description: "تسجيل مركبة جديدة",
+        icon: "📋",
+      },
+      {
+        title: "نقل ملكية مركبة",
+        description: "نقل ملكية المركبة",
+        icon: "🔄",
+      },
+    ],
   },
 
-  /* =========================
-     العمليات
-  ========================= */
+  education: {
+    title: "خدمات التعليم",
+    subtitle: "الوصول إلى خدماتك التعليمية بسهولة",
 
-  methods: {
-    handleFile(event) {
-      this.form.file = event.target.files[0];
-    },
+    description:
+      "يمكنك من خلال هذه الخدمة إنجاز مجموعة من المعاملات المتعلقة بالجامعات والمدارس والشهادات إلكترونياً.",
 
-    submitRequest() {
-      /*
-       * نجيب الطلبات القديمة
-       */
+    image: require("@/assets/images/edu.jpg"),
 
-      const oldRequests = JSON.parse(localStorage.getItem("requests")) || [];
+    options: [
+      {
+        title: "طلب شهادة",
+        description: "تقديم طلب للحصول على شهادة",
+        icon: "🎓",
+      },
+      {
+        title: "تصديق شهادة",
+        description: "تصديق الوثائق والشهادات",
+        icon: "📄",
+      },
+      {
+        title: "كشف علامات",
+        description: "طلب كشف العلامات",
+        icon: "📋",
+      },
+    ],
+  },
 
-      /*
-       * إنشاء طلب جديد
-       */
+  documents: {
+    title: "الوثائق الرسمية",
+    subtitle: "أنجز معاملاتك المتعلقة بالوثائق الرسمية إلكترونياً",
 
-      const newRequest = {
-        id: "REQ-" + Date.now(),
+    description:
+      "يمكنك من خلال هذه الخدمة تقديم طلبات إصدار وتجديد الوثائق الرسمية بسهولة وأمان.",
 
-        service: this.service.title,
+    image: require("@/assets/images/pass.jpg"),
 
-        serviceId: this.$route.params.id,
-
-        requestType: this.form.requestType,
-
-        fullName: this.form.fullName,
-
-        nationalId: this.form.nationalId,
-
-        phone: this.form.phone,
-
-        notes: this.form.notes,
-
-        status: "قيد المراجعة",
-
-        statusClass: "pending",
-
-        progress: 10,
-
-        date: new Date().toLocaleDateString("ar-SY"),
-      };
-
-      /*
-       * إضافة الطلب الجديد
-       */
-
-      oldRequests.push(newRequest);
-
-      /*
-       * حفظ الطلبات
-       */
-
-      localStorage.setItem(
-        "requests",
-
-        JSON.stringify(oldRequests)
-      );
-
-      /*
-       * إظهار رسالة النجاح
-       */
-
-      this.submitted = true;
-
-      console.log("تم إرسال الطلب:", newRequest);
-    },
+    options: [
+      {
+        title: "تجديد وثيقة",
+        description: "تجديد الوثائق الرسمية",
+        icon: "📄",
+      },
+      {
+        title: "إصدار وثيقة",
+        description: "إصدار وثيقة رسمية جديدة",
+        icon: "🪪",
+      },
+      {
+        title: "بيان شخصي",
+        description: "استخراج بيان شخصي",
+        icon: "📋",
+      },
+    ],
   },
 };
+
+/* =====================================
+   نموذج الطلب
+===================================== */
+
+const form = ref<RequestForm>({
+  fullName: "",
+  nationalId: "",
+  phone: "",
+  requestType: "",
+  notes: "",
+  file: null,
+});
+const service = computed<Service>(() => {
+  const id = route.params.id as string;
+
+  return services[id] || services["real-estate"];
+});
+
+/* =====================================
+   رفع الملف
+===================================== */
+
+function handleFile(event: Event): void {
+  const input = event.target as HTMLInputElement;
+
+  if (input.files && input.files.length > 0) {
+    form.value.file = input.files[0];
+  }
+}
+
+/* =====================================
+   إرسال الطلب
+===================================== */
+
+function submitRequest(): void {
+  const newRequest: Request = {
+    id: "REQ-" + Date.now(),
+
+    service: service.value.title,
+
+    serviceId: route.params.id as string,
+
+    requestType: form.value.requestType,
+
+    fullName: form.value.fullName,
+
+    nationalId: form.value.nationalId,
+
+    phone: form.value.phone,
+
+    notes: form.value.notes,
+
+    status: "قيد المراجعة",
+
+    statusClass: "pending",
+
+    progress: 10,
+
+    date: new Date().toLocaleDateString("ar-SY"),
+  };
+
+  /* =====================================
+     إضافة الطلب إلى Pinia
+  ===================================== */
+
+  requestStore.addRequest(newRequest);
+
+  /* =====================================
+     إظهار رسالة النجاح
+  ===================================== */
+
+  submitted.value = true;
+
+  console.log("تم إرسال الطلب:", newRequest);
+}
 </script>
+
+/* ===================================== الخدمة الحالية
+===================================== */
 
 <style lang="scss" scoped>
 .service-details {

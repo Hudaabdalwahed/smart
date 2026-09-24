@@ -51,7 +51,7 @@
           <div class="info-item">
             <span>نوع المعاملة</span>
             <strong>
-              {{ request.requestType || request.type || "غير محدد" }}
+              {{ request.requestType || "غير محدد" }}
             </strong>
           </div>
 
@@ -112,37 +112,59 @@
     </div>
   </div>
 </template>
+<script setup lang="ts">
+import { ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
-<script>
-export default {
-  name: "RequestDetailsView",
+import { useRequestStore } from "../stores/requestStore";
+import type { Request } from "../stores/requestStore";
 
-  data() {
-    return {
-      request: null,
-    };
-  },
+/* =====================================
+   Router
+===================================== */
 
-  created() {
-    this.loadRequest();
-  },
+const route = useRoute();
+const router = useRouter();
 
-  methods: {
-    loadRequest() {
-      const requestId = this.$route.params.id;
+/* =====================================
+   Pinia Store
+===================================== */
 
-      const requests = JSON.parse(localStorage.getItem("requests")) || [];
+const requestStore = useRequestStore();
 
-      this.request = requests.find((request) => request.id === requestId);
-    },
+/* =====================================
+   الطلب الحالي
+===================================== */
 
-    goBack() {
-      this.$router.push({
-        name: "my-requests",
-      });
-    },
-  },
-};
+const request = ref<Request | null>(null);
+
+/* =====================================
+   تحميل الطلب
+===================================== */
+
+function loadRequest(): void {
+  const requestId = route.params.id as string;
+
+  request.value = requestStore.getRequestById(requestId) || null;
+}
+
+/* =====================================
+   العودة إلى طلباتي
+===================================== */
+
+function goBack(): void {
+  router.push({
+    name: "my-requests",
+  });
+}
+
+/* =====================================
+   تحميل البيانات عند فتح الصفحة
+===================================== */
+
+requestStore.loadRequests();
+
+loadRequest();
 </script>
 
 <style scoped>

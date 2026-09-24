@@ -1,7 +1,7 @@
 <template>
   <main class="appointment-details-page">
     <!-- زر العودة -->
-    <button class="back-btn" @click="$router.push('/appointments')">
+    <button class="back-btn" @click="goToAppointments">
       → العودة إلى مواعيدي
     </button>
 
@@ -13,7 +13,7 @@
 
         <h1>تفاصيل الموعد</h1>
 
-        <span> معلومات الموعد الذي قمت بحجزه </span>
+        <span>معلومات الموعد الذي قمت بحجزه</span>
       </div>
 
       <!-- بطاقة التفاصيل -->
@@ -85,7 +85,7 @@
             إلغاء الموعد
           </button>
 
-          <button class="back-main-btn" @click="$router.push('/appointments')">
+          <button class="back-main-btn" @click="goToAppointments">
             العودة إلى مواعيدي
           </button>
         </div>
@@ -100,68 +100,90 @@
 
       <p>لم نتمكن من العثور على هذا الموعد.</p>
 
-      <button class="back-main-btn" @click="$router.push('/appointments')">
+      <button class="back-main-btn" @click="goToAppointments">
         العودة إلى مواعيدي
       </button>
     </section>
   </main>
 </template>
 
-<script>
-export default {
-  name: "AppointmentDetailsView",
+<script setup lang="ts">
+import { ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
-  data() {
-    return {
-      appointment: null,
-    };
-  },
+import { useAppointmentStore } from "../stores/appointmentStore";
+import type { Appointment } from "../stores/appointmentStore";
 
-  created() {
-    this.loadAppointment();
-  },
+/* =====================================
+   Router
+===================================== */
 
-  methods: {
-    /* =====================================
-       تحميل الموعد
-    ====================================== */
+const route = useRoute();
+const router = useRouter();
 
-    loadAppointment() {
-      const appointments =
-        JSON.parse(localStorage.getItem("appointments")) || [];
+/* =====================================
+   Pinia Store
+===================================== */
 
-      const appointmentId = this.$route.params.id;
+const appointmentStore = useAppointmentStore();
 
-      this.appointment = appointments.find(
-        (appointment) => appointment.id === appointmentId
-      );
-    },
+/* =====================================
+   الموعد الحالي
+===================================== */
 
-    /* =====================================
-       إلغاء الموعد
-    ====================================== */
+const appointment = ref<Appointment | null>(null);
 
-    cancelAppointment() {
-      const confirmed = confirm("هل أنت متأكد من إلغاء هذا الموعد؟");
+/* =====================================
+   تحميل الموعد
+===================================== */
 
-      if (!confirmed) {
-        return;
-      }
+function loadAppointment(): void {
+  const appointmentId = route.params.id as string;
 
-      let appointments = JSON.parse(localStorage.getItem("appointments")) || [];
+  appointment.value =
+    appointmentStore.getAppointmentById(appointmentId) || null;
+}
+/* =====================================
+   إلغاء الموعد
+===================================== */
 
-      appointments = appointments.filter(
-        (appointment) => appointment.id !== this.appointment.id
-      );
+function cancelAppointment(): void {
+  if (!appointment.value) {
+    return;
+  }
 
-      localStorage.setItem("appointments", JSON.stringify(appointments));
+  const confirmed = confirm("هل أنت متأكد من إلغاء هذا الموعد؟");
 
-      alert("تم إلغاء الموعد بنجاح");
+  if (!confirmed) {
+    return;
+  }
 
-      this.$router.push("/appointments");
-    },
-  },
-};
+  appointmentStore.deleteAppointment(appointment.value.id);
+
+  alert("تم إلغاء الموعد بنجاح");
+
+  router.push({
+    name: "appointments",
+  });
+}
+
+/* =====================================
+   العودة إلى المواعيد
+===================================== */
+
+function goToAppointments(): void {
+  router.push({
+    name: "appointments",
+  });
+}
+
+/* =====================================
+   تحميل البيانات
+===================================== */
+
+appointmentStore.loadAppointments();
+
+loadAppointment();
 </script>
 
 <style lang="scss" scoped>

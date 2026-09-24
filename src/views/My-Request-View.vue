@@ -1,4 +1,3 @@
-[9/22/2026 4:43 PM] Huda Abdalwahed:
 <template>
   <div class="requests-page">
     <!-- خلفيات زخرفية -->
@@ -109,7 +108,7 @@
               <span class="label"> نوع المعاملة </span>
 
               <strong>
-                {{ request.type || request.requestType }}
+                {{ request.requestType }}
               </strong>
             </div>
 
@@ -158,55 +157,68 @@
     </section>
   </div>
 </template>
+<script setup lang="ts">
+import { computed } from "vue";
+import { useRouter } from "vue-router";
 
-<script>
-export default {
-  name: "MyRequestView",
+import { useRequestStore } from "../stores/requestStore";
 
-  data() {
-    return {
-      requests: [],
-    };
-  },
+const router = useRouter();
 
-  created() {
-    this.loadRequests();
-  },
+const requestStore = useRequestStore();
 
-  computed: {
-    totalCount() {
-      return this.requests.length;
+/* =====================================
+   تحميل الطلبات
+===================================== */
+
+requestStore.loadRequests();
+
+/* =====================================
+   قائمة الطلبات
+===================================== */
+
+const requests = computed(() => {
+  return requestStore.requests;
+});
+
+/* =====================================
+   عدد كل الطلبات
+===================================== */
+
+const totalCount = computed(() => {
+  return requests.value.length;
+});
+
+/* =====================================
+   عدد الطلبات قيد المراجعة
+===================================== */
+
+const pendingCount = computed(() => {
+  return requests.value.filter((request) => request.statusClass === "pending")
+    .length;
+});
+
+/* =====================================
+   عدد الطلبات المكتملة
+===================================== */
+
+const completedCount = computed(() => {
+  return requests.value.filter((request) => request.statusClass === "completed")
+    .length;
+});
+
+/* =====================================
+   فتح تفاصيل الطلب
+===================================== */
+
+function showDetials(request: { id: string }): void {
+  router.push({
+    name: "request-details",
+    params: {
+      id: request.id,
     },
-
-    pendingCount() {
-      return this.requests.filter(
-        (request) => request.statusClass === "pending"
-      ).length;
-    },
-
-    completedCount() {
-      return this.requests.filter(
-        (request) => request.statusClass === "completed"
-      ).length;
-    },
-  },
-
-  methods: {
-    loadRequests() {
-      const savedRequests = JSON.parse(localStorage.getItem("requests")) || [];
-
-      this.requests = savedRequests;
-    },
-    showDetials(request) {
-      this.$router.push({
-        name: "request-details",
-        params: {
-          id: request.id,
-        },
-      });
-    },
-  },
-};
+  });
+}
 </script>
 
 <style lang="scss" scoped>
