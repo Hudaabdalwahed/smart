@@ -3,14 +3,13 @@
     <!-- خلفيات زخرفية -->
     <div class="ambient ambient-green"></div>
     <div class="ambient ambient-gold"></div>
-
     <!-- رأس الصفحة -->
     <section class="page-header">
       <span class="page-badge"> متابعة المعاملات </span>
 
       <h1>طلباتي</h1>
 
-      <p>يمكنك متابعة جميع طلباتك ومعرفة حالتها بسهولة</p>
+      <p>يمكنك متابعة جميع طلباتك ومعرفة المرحلة التي وصل إليها كل طلب</p>
     </section>
 
     <!-- إحصائيات الطلبات -->
@@ -22,11 +21,8 @@
         </div>
 
         <div>
-          <strong>
-            {{ totalCount }}
-          </strong>
-
-          <span> إجمالي الطلبات </span>
+          <strong>{{ totalCount }}</strong>
+          <span>إجمالي الطلبات</span>
         </div>
       </div>
 
@@ -37,11 +33,8 @@
         </div>
 
         <div>
-          <strong>
-            {{ pendingCount }}
-          </strong>
-
-          <span> قيد المراجعة </span>
+          <strong>{{ pendingCount }}</strong>
+          <span>قيد المراجعة</span>
         </div>
       </div>
 
@@ -52,11 +45,8 @@
         </div>
 
         <div>
-          <strong>
-            {{ completedCount }}
-          </strong>
-
-          <span> طلبات مكتملة </span>
+          <strong>{{ completedCount }}</strong>
+          <span>طلبات مكتملة</span>
         </div>
       </div>
     </section>
@@ -65,14 +55,13 @@
     <section class="requests-container">
       <div class="section-title">
         <div>
-          <span> المعاملات الخاصة بك </span>
-
+          <span>المعاملات الخاصة بك</span>
           <h2>آخر الطلبات</h2>
         </div>
 
         <button class="filter-btn">
           جميع الطلبات
-          <span> ⌄ </span>
+          <span>⌄</span>
         </button>
       </div>
 
@@ -82,7 +71,7 @@
           <!-- أعلى الكارد -->
           <div class="card-top">
             <div class="request-number">
-              <span> رقم الطلب </span>
+              <span>رقم الطلب</span>
 
               <strong>
                 {{ request.id }}
@@ -97,7 +86,7 @@
           <!-- معلومات الطلب -->
           <div class="request-info">
             <div class="info-item">
-              <span class="label"> الخدمة </span>
+              <span class="label">الخدمة</span>
 
               <strong>
                 {{ request.service }}
@@ -105,7 +94,7 @@
             </div>
 
             <div class="info-item">
-              <span class="label"> نوع المعاملة </span>
+              <span class="label">نوع المعاملة</span>
 
               <strong>
                 {{ request.requestType }}
@@ -113,7 +102,7 @@
             </div>
 
             <div class="info-item">
-              <span class="label"> تاريخ التقديم </span>
+              <span class="label">تاريخ التقديم</span>
 
               <strong>
                 {{ request.date }}
@@ -121,11 +110,46 @@
             </div>
           </div>
 
-          <!-- نسبة الإنجاز -->
+          <!-- مراحل الطلب -->
+          <div class="request-steps">
+            <div class="steps-title">
+              <span>مراحل الطلب</span>
+
+              <strong>
+                {{ currentStep(request) }} / {{ getSteps(request).length }}
+              </strong>
+            </div>
+
+            <div class="timeline">
+              <div
+                v-for="(step, index) in getSteps(request)"
+                :key="step"
+                class="timeline-step"
+                :class="{
+                  active: index + 1 === currentStep(request),
+                  completed: index + 1 < currentStep(request),
+                }"
+              >
+                <div class="step-circle">
+                  <span v-if="index + 1 < currentStep(request)"> ✓ </span>
+
+                  <span v-else>
+                    {{ index + 1 }}
+                  </span>
+                </div>
+
+                <span class="step-name">
+                  {{ step }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Progress -->
           <div class="card-bottom">
             <div class="progress-area">
               <div class="progress-text">
-                <span> نسبة الإنجاز </span>
+                <span>نسبة الإنجاز</span>
 
                 <strong> {{ request.progress }}% </strong>
               </div>
@@ -142,13 +166,16 @@
 
             <button class="details-btn" @click="showDetials(request)">
               عرض التفاصيل
-              <span> ← </span>
+
+              <span>←</span>
             </button>
           </div>
         </div>
 
-        <!-- في حال ما في طلبات -->
+        <!-- لا يوجد طلبات -->
         <div v-if="requests.length === 0" class="empty-state">
+          <div class="empty-icon">📄</div>
+
           <h3>لا يوجد لديك طلبات حالياً</h3>
 
           <p>عند إرسال طلب جديد سيظهر هنا.</p>
@@ -162,35 +189,36 @@ import { computed } from "vue";
 import { useRouter } from "vue-router";
 
 import { useRequestStore } from "../stores/requestStore";
+import type { Request } from "../stores/requestStore";
 
 const router = useRouter();
 
 const requestStore = useRequestStore();
 
-/* =====================================
-   تحميل الطلبات
+/* =====================================  
+   تحميل الطلبات  
 ===================================== */
 
 requestStore.loadRequests();
 
-/* =====================================
-   قائمة الطلبات
+/* =====================================  
+   قائمة الطلبات  
 ===================================== */
 
 const requests = computed(() => {
   return requestStore.requests;
 });
 
-/* =====================================
-   عدد كل الطلبات
+/* =====================================  
+   عدد كل الطلبات  
 ===================================== */
 
 const totalCount = computed(() => {
   return requests.value.length;
 });
 
-/* =====================================
-   عدد الطلبات قيد المراجعة
+/* =====================================  
+   عدد الطلبات قيد المراجعة  
 ===================================== */
 
 const pendingCount = computed(() => {
@@ -198,8 +226,8 @@ const pendingCount = computed(() => {
     .length;
 });
 
-/* =====================================
-   عدد الطلبات المكتملة
+/* =====================================  
+   عدد الطلبات المكتملة  
 ===================================== */
 
 const completedCount = computed(() => {
@@ -207,8 +235,104 @@ const completedCount = computed(() => {
     .length;
 });
 
-/* =====================================
-   فتح تفاصيل الطلب
+/* =====================================  
+   مراحل كل نوع خدمة  
+===================================== */
+
+function getSteps(request: Request): string[] {
+  const service = request.service.toLowerCase();
+
+  if (service.includes("شهادة") || request.requestType.includes("شهادة")) {
+    return [
+      "تقديم الطلب",
+      "استلام الطلب",
+      "تدقيق البيانات",
+      "اعتماد الطلب",
+      "إصدار الشهادة",
+      "جاهزة",
+    ];
+  }
+
+  if (
+    service.includes("عقار") ||
+    service.includes("العقارية") ||
+    request.requestType.includes("ملكية")
+  ) {
+    return [
+      "تقديم الطلب",
+      "تدقيق الوثائق",
+      "الكشف",
+      "الموافقة",
+      "نقل الملكية",
+      "مكتمل",
+    ];
+  }
+
+  if (service.includes("وثائق") || service.includes("وثيقة")) {
+    return [
+      "تقديم الطلب",
+      "استلام الطلب",
+      "تدقيق البيانات",
+      "اعتماد الطلب",
+      "إصدار الوثيقة",
+      "جاهزة",
+    ];
+  }
+
+  if (service.includes("مركبات") || service.includes("مركبة")) {
+    return [
+      "تقديم الطلب",
+      "تدقيق البيانات",
+      "الفحص",
+      "دفع الرسوم",
+      "التسجيل",
+      "مكتمل",
+    ];
+  }
+
+  return [
+    "تقديم الطلب",
+    "استلام الطلب",
+    "قيد المراجعة",
+    "اعتماد الطلب",
+    "المعالجة",
+    "مكتمل",
+  ];
+}
+
+/* =====================================  
+   تحديد المرحلة الحالية  
+===================================== */
+function currentStep(request: Request): number {
+  const steps = getSteps(request);
+
+  const progress = request.progress;
+
+  if (progress <= 10) {
+    return 1;
+  }
+
+  if (progress <= 25) {
+    return 2;
+  }
+
+  if (progress <= 45) {
+    return 3;
+  }
+
+  if (progress <= 65) {
+    return 4;
+  }
+
+  if (progress <= 85) {
+    return 5;
+  }
+
+  return steps.length;
+}
+
+/* =====================================  
+   فتح تفاصيل الطلب  
 ===================================== */
 
 function showDetials(request: { id: string }): void {
@@ -220,7 +344,6 @@ function showDetials(request: { id: string }): void {
   });
 }
 </script>
-
 <style lang="scss" scoped>
 /* ===================================
    الصفحة الرئيسية
@@ -403,7 +526,7 @@ function showDetials(request: { id: string }): void {
 }
 
 /* ===================================
-   أيقونات الإحصائيات
+ أيقونات الإحصائيات
 =================================== */
 
 .stat-icon {
@@ -427,6 +550,7 @@ function showDetials(request: { id: string }): void {
 .stat-icon.pending {
   background: linear-gradient(135deg, #f8efd0, #ead99b);
 }
+
 .stat-icon.completed {
   background: linear-gradient(135deg, #d9f0e2, #b8dfca);
 }
@@ -525,6 +649,12 @@ function showDetials(request: { id: string }): void {
   backdrop-filter: blur(10px);
 
   box-shadow: 0 8px 20px rgba(27, 94, 69, 0.08);
+
+  transition: 0.3s;
+}
+
+.filter-btn:hover {
+  transform: translateY(-2px);
 }
 
 /* ===================================
@@ -550,8 +680,8 @@ function showDetials(request: { id: string }): void {
 
   background: linear-gradient(
     135deg,
-    rgba(255, 255, 255, 0.78),
-    rgba(235, 247, 239, 0.7)
+    rgba(255, 255, 255, 0.82),
+    rgba(235, 247, 239, 0.74)
   );
 
   backdrop-filter: blur(18px);
@@ -625,7 +755,6 @@ function showDetials(request: { id: string }): void {
 
 .status.completed {
   background: rgba(27, 138, 97, 0.15);
-
   color: #18764f;
 }
 
@@ -670,6 +799,168 @@ function showDetials(request: { id: string }): void {
 }
 
 /* ===================================
+   مراحل الطلب
+=================================== */
+
+.request-steps {
+  padding: 20px 0 25px;
+
+  border-top: 1px solid rgba(27, 94, 69, 0.1);
+
+  border-bottom: 1px solid rgba(27, 94, 69, 0.1);
+}
+
+.steps-title {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  margin-bottom: 24px;
+}
+
+.steps-title span {
+  color: #7c8c84;
+
+  font-size: 13px;
+}
+
+.steps-title strong {
+  color: #1b5e45;
+
+  font-size: 13px;
+}
+
+/* ===================================
+   Timeline
+=================================== */
+
+.timeline {
+  display: flex;
+
+  align-items: flex-start;
+
+  justify-content: space-between;
+
+  position: relative;
+
+  gap: 5px;
+}
+
+.timeline::before {
+  content: "";
+
+  position: absolute;
+
+  top: 16px;
+
+  right: 5%;
+
+  left: 5%;
+
+  height: 3px;
+
+  background: #d9e5dd;
+
+  z-index: 0;
+}
+
+.timeline-step {
+  position: relative;
+
+  z-index: 1;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  gap: 8px;
+
+  flex: 1;
+
+  text-align: center;
+}
+
+.step-circle {
+  width: 34px;
+
+  height: 34px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #e3ebe6;
+
+  border: 3px solid #f5faf7;
+
+  color: #819088;
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  box-shadow: 0 3px 10px rgba(27, 94, 69, 0.08);
+
+  transition: 0.3s;
+}
+
+.step-name {
+  color: #87968e;
+
+  font-size: 10px;
+
+  line-height: 1.4;
+
+  max-width: 80px;
+
+  transition: 0.3s;
+}
+
+/* المرحلة المكتملة */
+
+.timeline-step.completed .step-circle {
+  background: linear-gradient(135deg, #1b5e45, #1b8a61);
+
+  color: white;
+
+  border-color: #d7eee1;
+}
+
+.timeline-step.completed .step-name {
+  color: #1b5e45;
+
+  font-weight: 700;
+}
+
+/* المرحلة الحالية */
+
+.timeline-step.active .step-circle {
+  background: linear-gradient(135deg, #c9a227, #e3c75d);
+
+  color: white;
+
+  border-color: #f7edc7;
+
+  transform: scale(1.12);
+
+  box-shadow: 0 0 0 5px rgba(201, 162, 39, 0.12);
+}
+
+.timeline-step.active .step-name {
+  color: #967714;
+
+  font-weight: 800;
+}
+
+/* ===================================
    Progress
 =================================== */
 
@@ -681,8 +972,6 @@ function showDetials(request: { id: string }): void {
   gap: 30px;
 
   padding-top: 18px;
-
-  border-top: 1px solid rgba(27, 94, 69, 0.1);
 }
 
 .progress-area {
@@ -726,8 +1015,9 @@ function showDetials(request: { id: string }): void {
 
   background: linear-gradient(90deg, #1b5e45, #1b8a61, #4cae7f);
 
-  transition: width 0.5s ease;
+  transition: width 0.7s ease;
 }
+
 /* ===================================
    زر التفاصيل
 =================================== */
@@ -780,6 +1070,12 @@ function showDetials(request: { id: string }): void {
   box-shadow: 0 15px 40px rgba(27, 94, 69, 0.08);
 }
 
+.empty-icon {
+  font-size: 42px;
+
+  margin-bottom: 10px;
+}
+
 .empty-state h3 {
   color: #1b5e45;
 
@@ -812,6 +1108,22 @@ function showDetials(request: { id: string }): void {
 
     align-items: stretch;
   }
+
+  .timeline {
+    overflow-x: auto;
+
+    justify-content: flex-start;
+
+    padding-bottom: 10px;
+  }
+
+  .timeline::before {
+    display: none;
+  }
+
+  .timeline-step {
+    min-width: 85px;
+  }
 }
 
 @media (max-width: 600px) {
@@ -839,6 +1151,32 @@ function showDetials(request: { id: string }): void {
 
   .filter-btn {
     font-size: 12px;
+  }
+
+  .request-card {
+    padding: 18px;
+  }
+
+  .card-top {
+    align-items: flex-start;
+
+    gap: 15px;
+  }
+
+  .timeline {
+    gap: 0;
+  }
+
+  .timeline-step {
+    min-width: 75px;
+  }
+
+  .step-name {
+    font-size: 9px;
+  }
+
+  .card-bottom {
+    gap: 18px;
   }
 }
 </style>
